@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "structVehicle.c"
 
 /* Program Creates a single lane of traffic and evaluates
     what happens when their is an acceleration difference
@@ -31,15 +32,35 @@
 // Amount of vehicles on road. Change to malloc for dynamic array
 #define N 10
 #define dt .01
+#define tEnd 10
 // Architecture. No matrix to store the time steps of each car so that memory issues wont be a problem. Instead stored to a file.
+
+
 
 int main()
 {
-    double vehTrack[N];
+    struct Vehicle road[N];
+    FILE *f = fopen("TrafficFlow.csv");
+    short i=0, j=0; // loop counters
+    float lambda = 1;
 
-    // Block asks for user input. (How many cars, trucks?, position of trucks, speed changes
+    // Block asks for user input. (How many cars, trucks?, position of trucks, speed change
+        // Setting up the initial velocity of the lead vehicle
+    road[0].v = 30;
+
+        // Setting up lambda for each vehicle. Defaults to 1
+    for( i=0; i<N; i++ ){
+        road[i].y = lambda;
+    }
+
 
     // Block of code calculates the change in velocity of each vehicle per timestep
+        // dv/dj is 0 for this sections
+    for( i=1; i<N; i++ ){
+        //for( j=0; j<10; j+= ){
+            road[i].
+        }
+    }
 
     // Block of code evaluates a crash?
 }
