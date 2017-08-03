@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1501771263 source:c:\users\jo\desktop\vac_programsgit\joelc_vac_trafficflowfinal\trafficflowfinal\main.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"structVehicle.c"
+	"omp.h"
+
+1501771034 c:\users\jo\desktop\vac_programsgit\joelc_vac_trafficflowfinal\trafficflowfinal\structvehicle.c
+
+1501771034 source:c:\users\jo\desktop\vac_programsgit\joelc_vac_trafficflowfinal\trafficflowfinal\structvehicle.c
+
