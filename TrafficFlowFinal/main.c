@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "structVehicle.c"
-#include "omp.h"
+//#include "omp.h"
 
 /* Program Creates a single lane of traffic and evaluates
     what happens when their is an acceleration difference
@@ -48,14 +48,14 @@ int main()
     short i=0, j=0; // loop counters
     float lambda = 1;
 
-    omp_set_num_threads(4); // Only got 4 CPUs on my laptop
+    //omp_set_num_threads(4); // Only got 4 CPUs on my laptop
 
     /// Block asks for user input. (How many cars, trucks?, position of trucks, speed change)
         // Setting up the initial velocity of the lead vehicle.
     road[0].v = 30;
 
         // Setting up lambda for each vehicle. Defaults to 1
-    #pragma omp parallel for private(lambda)
+    //#pragma omp parallel for private(lambda)
     for( i=0; i<N; i++ ){
         road[i].y = lambda;
     }
