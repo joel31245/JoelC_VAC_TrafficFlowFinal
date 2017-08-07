@@ -29,7 +29,7 @@
       NOTE: MAX Decel is 23.87 ft/s^2 or 7.276 m/s^2
       TODO:  - Need to find out how to put in seperation distance. DEPENDS ON SPEED. FOR 30 m/s^s at 0.9 lambda its calculatable. Use computer to display min Sep Distance.
              - Put cap on speed
-             - Fix the acceleration for 30%
+             - Build Test Cases and File Formatting
 
 */
 
