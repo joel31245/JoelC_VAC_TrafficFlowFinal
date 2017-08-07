@@ -63,10 +63,10 @@ int main()
         float eachVehLength = 4.80;
         float lambda = .9;      // default all set to this lambda (>1 means everyone overreacts, <1 everyone under reacts, 1 everyone reacts perfectly to speed changes?)
     // Runtime Protocol
-        short accelFlag = 0;    // Sets the first vehicle's runtime conditions. ( 0 - steady state, 1 - 30% increase in speed, 2 - 30% decrease in speed )
+        short accelFlag = 1;    // Sets the first vehicle's runtime conditions. ( 0 - steady state, 1 - 30% increase in speed, 2 - 30% decrease in speed )
     // Time
         short tEnd = 10;        // End of time sample. Should not be too long as we are only doing specific cases.
-        float dt = .40;
+        float dt = .5;
     /// OUTPUT VARS
     short crash = 0;        // Crash flag. Lets the output know that there was a crash.
     road = malloc( sizeof(sizeOfVeh)*vehAmt );
@@ -129,7 +129,6 @@ int main()
                 crash = 1;
             }
 
-
             road[i].v = vNew; road[i].x = xNew;
             printf("(%d) %2.2f (XXXX) %2.2f   ", i,vNew,xNew );
         }
@@ -150,18 +149,20 @@ float v0( float start0Vel, float v0, float dt, short accelFlag ){
     if( accelFlag == 0 ){
         return v0;
     }
-    /// UNSTEADY, Acceleration Speed Up 30% over .5 a second
+
         // Optional HOWEVER, ENCROACHING ON NICO'S PROJECT. Suggested by Dr Prosperreti, use a function (specifically tanh) to model this acceleration
-    else if( accelFlag == 1 ){
+    else if( accelFlag != 0 ){
         float vDiff = start0Vel*1.3 - start0Vel;
-        vDiff = vDiff/.5*dt; // Acceleration.
-        return v0+vDiff;
-    }
+        if( fabs(v0-start0Vel) < fabs(start0Vel*1.3-start0Vel) ){
+            vDiff = vDiff/.5*dt; // Acceleration.
+        }
+        else vDiff = 0;
+//        printf("Accel: %f\n", vDiff);
+
+    /// UNSTEADY, Acceleration Speed Up 30% over .5 a second
+        if ( accelFlag == 1) return v0+vDiff;
     /// UNSTEADY, Acceleration Slow Down 30%
-    else if( accelFlag == 2 ){
-        float vDiff = start0Vel*0.7 - start0Vel;
-        vDiff = vDiff/.5*dt; // Acceleration.
-        return v0+vDiff;
+        else if ( accelFlag == 2) return v0-vDiff;
     }
 
 }
