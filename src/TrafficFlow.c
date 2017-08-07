@@ -34,7 +34,7 @@
 
 // Amount of vehicles on road. Change to malloc for dynamic array
 #define N 10
-#define dt .1
+#define dt 1.0
 #define tEnd 10
 // Architecture. No matrix to store the time steps of each car so that memory issues wont be a problem. Instead stored to a file.
 
@@ -43,7 +43,9 @@ struct Vehicle{
     float y;
 };
 
-float f(float v1,float y1,  float v0,  float t){ return y1*(v1-v0); }
+float f(float v1,float y1,  float v0){
+    return y1*(v0-v1);
+}
 float v0( float v0, short flag );
 
 int main()
@@ -57,13 +59,15 @@ int main()
 
     /// Block asks for user input. (How many cars, trucks?, position of trucks, speed change)
         // Setting up the initial velocity of the lead vehicle.
-    road[0].v = 30;
-    printf(" %d\n ", road[0].v);
+    //printf(" %d\n ", road[0].v);
         // Setting up lambda for each vehicle. Defaults to 1
     //#pragma omp parallel for private(lambda)
     for( i=0; i<N; i++ ){
         road[i].y = lambda;
+        road[i].v = 30 ;
+
     }
+    road[0].v = 30;
 
 
     /// Block of code calculates the change in velocity of each vehicle per timestep
@@ -78,27 +82,33 @@ int main()
 //        fprintf(f, "\n"); printf("\n");
 //    }
         // For non steady state need the first vehicle to change according to conditions. ALl others Runge-Kutta
+
     float vNew, vStar, vStar2, vStar3; //Temporary vars
     float t;
-    for( t=dt; t<tEnd+dt; t+=dt ){
+    for( t=0; t<tEnd+dt; t+=dt ){
         // Setting the initial (first car to an initial acceleration)
         road[0].v = v0( road[0].v, 0);
         printf("(Time: %2.2f) (%d) %f   ", t,0, road[0].v );
         // Setting the rest of the cars
         for( i=1; i<N; i++ ){
-            vStar = road[i].v + dt/2*f(road[i].v,road[i].y, road[i-1].v, t);
-            vStar2 = road[i].v + dt/2*f(vStar,road[i].y, road[i-1].v, t+.5*dt);
-            vStar3 = road[i].v + dt/2*f(vStar2,road[i].y, road[i-1].v, t+.5*dt);
-            vNew = road[i].v+dt/6*( f(road[i].v,road[i].y, road[i-1].v,t) + 2*f(vStar,road[i].y, road[i-1].v, t+.5*dt) + 2*f(vStar2,road[i].y, road[i-1].v, t+.5*dt) + f(vStar3,road[i].y, road[i-1].v, t) );
+            vStar = road[i].v + dt/2*f(road[i].v,road[i].y, road[i-1].v);
+            vStar2 = road[i].v + dt/2*f(vStar,road[i].y, road[i-1].v);
+            vStar3 = road[i].v + dt*f(vStar2,road[i].y, road[i-1].v);
+            vNew = road[i].v+dt/6*( f(road[i].v,road[i].y, road[i-1].v) + 2*f(vStar,road[i].y, road[i-1].v) +
+                                     2*f(vStar2,road[i].y, road[i-1].v) +   f(vStar3,road[i].y, road[i-1].v) );
+
+            // Check max acceleration
+
 
             road[i].v = vNew;
-            printf("(%d) %f   ", i,road[i].v );
+            printf("(%d) %f   ", i,vNew );
         }
         printf("\n\n\n");
     }
 
 
     /// Block of code tests and evaluates a crash?
+
 
     fclose(fvel);
 
