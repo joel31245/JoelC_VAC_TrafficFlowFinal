@@ -88,15 +88,12 @@ int main()
 
     /// Block asks for user input. (How many cars, trucks?, position of trucks, speed change)
     //#pragma omp parallel for private(lambda)
-    printf("(Time: %2.2f) ", 0.00);
     for( i=0; i<vehAmt; i++ ){
         road[i].y = lambda;
         road[i].v = initVel;                velsP[0][i] = initVel;
         road[i].x = -i*initSepDist;         posP[0][i] = -i*initSepDist;
         road[i].length = eachVehLength;
-        printf(" (%d) %2.2f (XXXX) %2.2f    ", i,road[i].v, road[i].x);
     }
-    printf("\n\n\n");
     start0Vel = road[0].v;
 
 
@@ -108,7 +105,6 @@ int main()
     j=1;
     for( t=dt; t<tEnd+dt; t+=dt ){
         // Setting the initial (first car to an initial acceleration)
-                road[0].v = v0( start0Vel, road[0].v, dt, accelFlag);
 
         velsP[j][0] = v0( start0Vel, velsP[j-1][0], dt, accelFlag);
         vNew = ( velsP[j][0]-velsP[j-1][0] )/2;
@@ -117,43 +113,40 @@ int main()
         else if( velsP[j][0]-velsP[j-1][0] < 0 ) posP[j][0] = ( velsP[j-1][0]-vNew )*dt + posP[j-1][0];
         else posP[j][0] = ( velsP[j][0] )*dt + posP[j-1][0];
 
-                road[0].x = road[0].v*dt + road[0].x;   // WILL NOT BE ANALYTICALLY CORRECT so CHANGE IN X IS 4th order but ACTUAL X is only 1st ORDER
-        printf("(Time: %2.2f) (%d) %f (XXX) %f   ", t,0, road[0].v, road[0].x );
         // Setting the rest of the cars
         for( i=1; i<vehAmt; i++ ){
-            vStar = road[i].v + dt/2*f(road[i].v,road[i].y, road[i-1].v);
-            xStar = road[i].x + dt/2*v(road[i].v);
+            vStar = velsP[j-1][i] + dt/2*f(velsP[j-1][i],road[i].y, velsP[j][i-1]);
+            xStar = posP[j-1][i] + dt/2*v(velsP[j-1][i]);
 
-            vStar2 = road[i].v + dt/2*f(vStar,road[i].y, road[i-1].v);
-            xStar2 = road[i].x + dt/2*v(vStar);
+            vStar2 = velsP[j-1][i] + dt/2*f(vStar,road[i].y, velsP[j][i-1]);
+            xStar2 = posP[j-1][i] + dt/2*v(vStar);
 
-            vStar3 = road[i].v + dt*f(vStar2,road[i].y, road[i-1].v);
-            xStar3 = road[i].x + dt/2*v(vStar2);
+            vStar3 = velsP[j-1][i] + dt*f(vStar2,road[i].y, velsP[j][i-1]);
+            xStar3 = posP[j-1][i] + dt/2*v(vStar2);
 
-            vNew = road[i].v+dt/6*( f(road[i].v,road[i].y, road[i-1].v) + 2*f(vStar,road[i].y, road[i-1].v) +
-                                    2*f(vStar2,road[i].y, road[i-1].v) +   f(vStar3,road[i].y, road[i-1].v) );
-            xNew = road[i].x+dt/6*( v(road[i].v) + 2*v(vStar) + 2*v(vStar2) + v(vStar3) );
+            vNew = velsP[j-1][i]+dt/6*( f(velsP[j-1][i],road[i].y, velsP[j][i-1]) + 2*f(vStar,road[i].y, velsP[j][i-1]) +
+                                    2*f(vStar2,road[i].y, velsP[j][i-1]) +   f(vStar3,road[i].y, velsP[j][i-1]) );
+            xNew = posP[j-1][i]+dt/6*( v(velsP[j-1][i]) + 2*v(vStar) + 2*v(vStar2) + v(vStar3) );
 
             // Check max acceleration
-            if( fabs(vNew-road[i].v)/dt > maxAccel ){
-                if( (vNew-road[i].v)/dt > 0 ){
-                    vNew = maxAccel*dt + road[i].v;
+            if( fabs(vNew-velsP[j-1][i])/dt > maxAccel ){
+                if( (vNew-velsP[j-1][i])/dt > 0 ){
+                    vNew = maxAccel*dt + velsP[j-1][i];
                 }
                 else {
-                    vNew = -maxAccel*dt + road[i].v;
+                    vNew = -maxAccel*dt + velsP[j-1][i];
                 }
             }
             // Check for crash
-            if(   (road[i-1].x - road[i].x) < road[i-1].length   ){
+            if(   (posP[j][i-1] - xNew) < road[i-1].length   ){
                 crash = 1;
+                break;
             }
 
             velsP[j][i] = vNew; posP[j][i] = xNew;
             road[i].v = vNew; road[i].x = xNew;
-            printf("(%d) %2.2f (XXXX) %2.2f   ", i,vNew,xNew );
         }
-        if( crash != 0 ){ printf("CRASH DETECTED");  }
-        printf("\n\n\n");
+        if( crash != 0 ){ break;  }
         j++;
     }
     printf("\n\n\n\n\n");
