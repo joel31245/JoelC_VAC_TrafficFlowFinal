@@ -1,0 +1,4 @@
+comma delimiters
+(integer) tEnd, (decimal) dt, (integer) runtimeProtocolFlag, (integer) amountOfVehicles, 
+[repeat for how many vehicles specified] 
+(decimal) lambda, (decimal) vehicleLength, (decimal) initialSeparationDistance(from car in front), (decimal) initialVelocity,

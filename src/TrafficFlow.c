@@ -38,29 +38,32 @@
 struct Vehicle{
     float length; //( Used for crashes. )
     float y;
+    // COULD HAVE SPEED, AND ACCELERATION CAPS IN HERE
 };
 
-float f(float v1,float y1,  float v0){ return y1*(v0-v1); }
-float v(float v1) { return v1; }
+/// CALCULATION SPECIFIC FUNCTIONS
+    float f(float v1,float y1,  float v0){ return y1*(v0-v1); }
+    float v(float v1) { return v1; }
+    // Method for different runtime conditions
+    float v0( float start0Vel, float v0, float dt, short flag );
 
-float v0( float start0Vel, float v0, float dt, short flag );
 
 int main()
 {
     struct Vehicle *road, sizeOfVeh;
-    FILE *inF = fopen("VehicleInfo.txt", "r");
+    FILE *inpt = fopen("VehicleInfo.txt", "r");
     FILE *fvel = fopen("TrafficFlowVel.csv", "w");
     FILE *fpos = fopen("TrafficFlowPos.csv", "w");
     FILE *fcrash = fopen("CrashReport.txt", "w");
     short i=0, j=0;         // loop counters
     /// CONSTANTS
-    float maxAccel = 7.276;
+    float maxAccel = 7.276;     // NOTE: Instead of constant across all cars change to make it car specific
     /// INPUT VARS
     short vehAmt = 10;
     // Initial Vehicle Conditions (For now all the same, later on will change to have individual tendencies.
         float start0Vel;
         float initVel = 30;     // NOTE: All units in meters, meters/second, or meters per second squared
-        float initSepDist = 200;
+        float initSepDist = 200;// NOTE: Instead of constant across all cars, User will be able to change it.
         float eachVehLength = 4.80;
         float lambda = .9;      // default all set to this lambda (>1 means everyone overreacts, <1 everyone under reacts, 1 everyone reacts perfectly to speed changes?)
     // Runtime Protocol
@@ -68,18 +71,78 @@ int main()
     // Time
         short tEnd = 10;        // End of time sample. Should not be too long as we are only doing specific cases.
         float dt = 1;
-    /// OUTPUT VARS
-    short crash = 0;        // Crash flag. Lets the output know that there was a crash.
-    road = malloc( sizeof(sizeOfVeh)*vehAmt );
-    float **velsP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
-    for( j=0; j<ceil(tEnd/dt)+1; j++ ){
-        velsP[j] = malloc( sizeof(float)*vehAmt );
-    }
-    float **posP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
-    for( j=0; j<ceil(tEnd/dt)+1; j++ ){
-        posP[j] = malloc( sizeof(float)*vehAmt );
-    }
 
+    /// READING IN INPUT
+    if( inpt == NULL ){ printf("Error Reading File. Possibly empty File."); fprintf(fcrash, "Error Reading File. Possibly empty File."); return 1; }
+    else{
+        // Time
+            fscanf(inpt, "%d,", &tEnd);
+                if(tEnd <= 0 || tEnd > 1000000){
+                                        printf("Invalid End Time Entry. Using a default value (10).\n");
+                                        fprintf(fcrash, "Error Reading File. Invalid End Time Entry. Using a default value (10).\n");
+                                        tEnd = 10;
+                                      }
+            fscanf(inpt, "%f,", &dt);
+                if(dt <= 0 || dt > tEnd/10){
+                                        printf("Invalid Time Step Entry. Using a default value (0.01).\n");
+                                        fprintf(fcrash, "Error Reading File. Invalid Time Step Entry. Using a default value (0.01).\n");
+                                        dt = 0.01;
+                                      }
+        // Runtime Protocol
+            fscanf(inpt, "%d,", &accelFlag);
+                if(accelFlag < 0 || accelFlag > 2){
+                                        printf("Invalid RunTime Flag Entry. Using a default value (0 - Steady State).\n");
+                                        fprintf(fcrash, "Error Reading File. Invalid RunTime Flag Entry. Using a default value (0 - Steady State).\n");
+                                        accelFlag = 0;
+                                      }
+        // Vehicle Information
+        float prevSepDist = 4.80;
+        fscanf(inpt, "%d,", &vehAmt);
+            if( vehAmt<0 ){
+                    printf("Invalid Vehicle Amount Entered. Process Terminated.\n");
+                    fprintf(fcrash, "Error Reading File. Invalid Vehicle Amount Entered.");
+                    return 2;
+            }
+            if( vehAmt==1){
+                    printf("Entry making Program Run 1 Vehicle. NOTE: This is not a traffic flow problem.\n");
+                    fprintf(fcrash, "Error Reading File. Entry making Program Run 1 Vehicle. NOTE: This is not a traffic flow problem..\n");
+            }
+
+
+    /// OUTPUT VARS
+        short crash = 0;        // Crash flag. Lets the output know that there was a crash.
+        road = malloc( sizeof(sizeOfVeh)*vehAmt );
+        float **velsP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
+        for( j=0; j<ceil(tEnd/dt)+1; j++ ){
+            velsP[j] = malloc( sizeof(float)*vehAmt );
+        }
+        float **posP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
+        for( j=0; j<ceil(tEnd/dt)+1; j++ ){
+            posP[j] = malloc( sizeof(float)*vehAmt );
+        }
+
+
+    /// READING IN EACH VEHICLE PARAMETERS
+        for( i=0; i<vehAmt; i++ ){
+            fscanf(inpt, "%f,", &lambda);
+                if(lambda <= 0       ){ printf("Invalid Lambda Entry. Using a default value (4.80 m).\n");
+                                        fprintf(fcrash, "Error Reading File. Invalid Lambda Entry. Using a default value (0.90 m).\n");
+                                        lambda = 0.9;
+                                      }
+            fscanf(inpt, "%f,", &eachVehLength);
+                if(eachVehLength <= 0){ printf("Invalid Vehicle Length Entry. Using a default value (4.80 m).\n");
+                                        fprintf(fcrash, "Error Reading File. Invalid Vehicle Length Entry. Using a default value (4.80 m).\n");
+                                        eachVehLength = 4.80;
+                                      }
+            fscanf(inpt, "%f,", &initSepDist);
+                if(initSepDist <= prevSepDist){
+                                        printf("Invalid Initial Seperation Distance Entry. Using a default value (200 m).\n");
+                                        fprintf(fcrash, "Error Reading File. Invalid Initial Seperation Distance Entry. Using a default value (200 m).\n"); eachVehLength = 200;
+                                      }
+                if(i==0)
+            fscanf(inpt, "%f,", &initVel);       // Make it throw warning for impractical initial velocity runs.
+        }
+    }
 
 
     //omp_set_num_threads(4); // Only got 4 CPUs on my laptop
@@ -142,12 +205,10 @@ int main()
             }
 
             velsP[j][i] = vNew; posP[j][i] = xNew;
-            road[i].v = vNew; road[i].x = xNew;
         }
         if( crash != 0 ){ break;  }
         j++;
     }
-    printf("\n\n\n\n\n");
 
 
     if( crash == 0 ){
@@ -160,7 +221,7 @@ int main()
     /// Printing to a file and print sequence.
     t = 0.00;
     for( j=0; j<(ceil(tEnd/dt)+1); j++ ){
-        printf("(BLOCKTime: %2.2f)  ", t );
+        printf("(Time: %2.2f)  ", t );
         for( i=0; i<vehAmt; i++ ){
             fprintf(fvel, "%f,",velsP[j][i] );
             fprintf(fpos, "%f,",posP[j][i] );
