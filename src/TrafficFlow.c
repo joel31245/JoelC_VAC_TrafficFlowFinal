@@ -50,7 +50,10 @@ float v0( float start0Vel, float v0, float dt, short flag );
 int main()
 {
     struct Vehicle *road, sizeOfVeh;
-    FILE *fvel = fopen("TrafficFlow.csv","w");
+    FILE *inF = fopen("VehicleInfo.txt", "r");
+    FILE *fvel = fopen("TrafficFlowVel.csv", "w");
+    FILE *fpos = fopen("TrafficFlowPos.csv", "w");
+    FILE *fcrash = fopen("CrashReport.txt", "w");
     short i=0, j=0;         // loop counters
     /// CONSTANTS
     float maxAccel = 7.276;
@@ -66,11 +69,18 @@ int main()
         short accelFlag = 1;    // Sets the first vehicle's runtime conditions. ( 0 - steady state, 1 - 30% increase in speed, 2 - 30% decrease in speed )
     // Time
         short tEnd = 10;        // End of time sample. Should not be too long as we are only doing specific cases.
-        float dt = .5;
+        float dt = 1;
     /// OUTPUT VARS
     short crash = 0;        // Crash flag. Lets the output know that there was a crash.
     road = malloc( sizeof(sizeOfVeh)*vehAmt );
-
+    float **velsP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
+    for( j=0; j<ceil(tEnd/dt)+1; j++ ){
+        velsP[j] = malloc( sizeof(float)*vehAmt );
+    }
+    float **posP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
+    for( j=0; j<ceil(tEnd/dt)+1; j++ ){
+        posP[j] = malloc( sizeof(float)*vehAmt );
+    }
 
 
 
@@ -81,8 +91,8 @@ int main()
     printf("(Time: %2.2f) ", 0.00);
     for( i=0; i<vehAmt; i++ ){
         road[i].y = lambda;
-        road[i].v = initVel;
-        road[i].x = -i*initSepDist;
+        road[i].v = initVel;                velsP[0][i] = initVel;
+        road[i].x = -i*initSepDist;         posP[0][i] = -i*initSepDist;
         road[i].length = eachVehLength;
         printf(" (%d) %2.2f (XXXX) %2.2f    ", i,road[i].v, road[i].x);
     }
@@ -95,10 +105,19 @@ int main()
     float vNew, vStar, vStar2, vStar3; //Temporary vars for velocity
     float xNew, xStar, xStar2, xStar3;
     float t;
+    j=1;
     for( t=dt; t<tEnd+dt; t+=dt ){
         // Setting the initial (first car to an initial acceleration)
-        road[0].v = v0( start0Vel, road[0].v, dt, accelFlag);
-        road[0].x = road[0].v*dt + road[0].x;
+                road[0].v = v0( start0Vel, road[0].v, dt, accelFlag);
+
+        velsP[j][0] = v0( start0Vel, velsP[j-1][0], dt, accelFlag);
+        vNew = ( velsP[j][0]-velsP[j-1][0] )/2;
+        // WORKS FOR CONSTANT ACCELERATION. IS THE ANALYTICAL SOLUTION.
+        if( velsP[j][0]-velsP[j-1][0] > 0 ) posP[j][0] = ( velsP[j-1][0]+vNew )*dt + posP[j-1][0];
+        else if( velsP[j][0]-velsP[j-1][0] < 0 ) posP[j][0] = ( velsP[j-1][0]-vNew )*dt + posP[j-1][0];
+        else posP[j][0] = ( velsP[j][0] )*dt + posP[j-1][0];
+
+                road[0].x = road[0].v*dt + road[0].x;   // WILL NOT BE ANALYTICALLY CORRECT so CHANGE IN X IS 4th order but ACTUAL X is only 1st ORDER
         printf("(Time: %2.2f) (%d) %f (XXX) %f   ", t,0, road[0].v, road[0].x );
         // Setting the rest of the cars
         for( i=1; i<vehAmt; i++ ){
@@ -129,16 +148,44 @@ int main()
                 crash = 1;
             }
 
+            velsP[j][i] = vNew; posP[j][i] = xNew;
             road[i].v = vNew; road[i].x = xNew;
             printf("(%d) %2.2f (XXXX) %2.2f   ", i,vNew,xNew );
         }
         if( crash != 0 ){ printf("CRASH DETECTED");  }
         printf("\n\n\n");
+        j++;
+    }
+    printf("\n\n\n\n\n");
+
+
+    if( crash == 0 ){
+        fprintf(fcrash, "CLEAR - No incidents to report.");
+    }
+    else{
+        fprintf(fcrash, "ACCIDENT - Time(%2.2f)\nVehicles: %d and %d\nCollision Speed: %f", t,  i,i-1,  fabs(vNew-velsP[j][i-1]) );
+    }
+
+    /// Printing to a file and print sequence.
+    t = 0.00;
+    for( j=0; j<(ceil(tEnd/dt)+1); j++ ){
+        printf("(BLOCKTime: %2.2f)  ", t );
+        for( i=0; i<vehAmt; i++ ){
+            fprintf(fvel, "%f,",velsP[j][i] );
+            fprintf(fpos, "%f,",posP[j][i] );
+            printf("(%d) %2.2f (XXXX) %2.2f   ", i,velsP[j][i],posP[j][i] );
+        }
+        printf("\n\n\n"); fprintf(fvel, "\n"); fprintf(fpos,"\n");
+        t+=dt;
     }
 
 
     fclose(fvel);
-    printf("\nSize of Vehicle: %d", sizeof(road[0]) );
+    fclose(fpos);
+    fclose(fcrash);
+    free(road);
+    free(velsP);
+    free(posP);
 
     return 0;
 }
