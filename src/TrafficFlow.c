@@ -36,9 +36,7 @@
 // Architecture. No matrix to store the time steps of each car so that memory issues wont be a problem. Instead stored to a file.
 
 struct Vehicle{
-    float x;      //( Position of the front bumper. )
     float length; //( Used for crashes. )
-    float v;
     float y;
 };
 
@@ -90,11 +88,11 @@ int main()
     //#pragma omp parallel for private(lambda)
     for( i=0; i<vehAmt; i++ ){
         road[i].y = lambda;
-        road[i].v = initVel;                velsP[0][i] = initVel;
-        road[i].x = -i*initSepDist;         posP[0][i] = -i*initSepDist;
+        velsP[0][i] = initVel;
+        posP[0][i] = -i*initSepDist;
         road[i].length = eachVehLength;
     }
-    start0Vel = road[0].v;
+    start0Vel = velsP[0][0];
 
 
     /// Block of code calculates the change in velocity of each vehicle per timestep
@@ -197,7 +195,6 @@ float v0( float start0Vel, float v0, float dt, short accelFlag ){
             vDiff = vDiff/.5*dt; // Acceleration.
         }
         else vDiff = 0;
-//        printf("Accel: %f\n", vDiff);
 
     /// UNSTEADY, Acceleration Speed Up 30% over .5 a second
         if ( accelFlag == 1) return v0+vDiff;
