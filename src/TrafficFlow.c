@@ -10,13 +10,13 @@
     Applications: Automated Traffic on a single lane highway.
 
     Goals:
-     - BASE GET base code in. Make everything variable.
+     -/ BASE GET base code in. Make everything variable.
         -/ Steady State Conditions ---> 30% increase in velocity
         -/ Steady State Conditions ---> 30% increase in velocity
-        - From Standing (Rest)    ---> Initial Velocity
+        -/ From Standing (Rest)    ---> Initial Velocity
      -/ BASE GET acceleration based on distance between vehicles.
      - Be able to add in vehicles with different reaction parameters (like trucks and motorcycles)
-     - Full Stop (A simulated light or reacting to a crash up ahead )
+     -/ Full Stop (A simulated light or reacting to a crash up ahead )
      - Minimum Separation Distance without crashing.
      -/ Write to a file
      -/ Display using Matlab or Paraview
