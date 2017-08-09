@@ -45,7 +45,7 @@ struct Vehicle{
     float f(float v1,float y1,  float v0){ return y1*(v0-v1); }
     float v(float v1) { return v1; }
     // Method for different runtime conditions
-    float v0( float start0Vel, float v0, float dt, short flag );
+    float v0( float start0Vel, float v0, float dt, short flag, float maxAccel );
 
 
 int main()
@@ -95,12 +95,11 @@ int main()
                                       }
         // Runtime Protocol
             fscanf(inpt, "%d,", &accelFlag);
-                if(accelFlag < 0 || accelFlag > 2){
+                if(accelFlag < 0 || accelFlag > 4){
                                         printf("Invalid RunTime Flag Entry. Using a default value (0 - Steady State).\n");
                                         fprintf(ferror, "Error Reading File. Invalid RunTime Flag Entry. Using a default value (0 - Steady State).\n");
                                         accelFlag = 0;
                                       }
-                printf("Accel Flag: %d\n", accelFlag);
         // Vehicle Information
         float prevSepDist = 4.80;
         fscanf(inpt, "%d,", &vehAmt);
@@ -173,12 +172,13 @@ int main()
     for( t=dt; t<tEnd+dt; t+=dt ){
         // Setting the initial (first car to an initial acceleration)
 
-        velsP[j][0] = v0( start0Vel, velsP[j-1][0], dt, accelFlag);
+        velsP[j][0] = v0( start0Vel, velsP[j-1][0], dt, accelFlag, maxAccel);
         vNew = ( velsP[j][0]-velsP[j-1][0] )/2;
+
         // WORKS FOR CONSTANT ACCELERATION. IS THE ANALYTICAL SOLUTION.
-        if( velsP[j][0]-velsP[j-1][0] > 0 ) posP[j][0] = ( velsP[j-1][0]+vNew )*dt + posP[j-1][0];
-        else if( velsP[j][0]-velsP[j-1][0] < 0 ) posP[j][0] = ( velsP[j-1][0]-vNew )*dt + posP[j-1][0];
-        else posP[j][0] = ( velsP[j][0] )*dt + posP[j-1][0];
+        if( velsP[j][0]-velsP[j-1][0] > 0 )         posP[j][0] = ( velsP[j-1][0]+vNew )*dt + posP[j-1][0];
+        else if( velsP[j][0]-velsP[j-1][0] < 0 )    posP[j][0] = ( velsP[j-1][0]-vNew )*dt + posP[j-1][0];
+        else                                        posP[j][0] = ( velsP[j][0] )*dt + posP[j-1][0];
 
         // Setting the rest of the cars
         for( i=1; i<vehAmt; i++ ){
@@ -221,11 +221,13 @@ int main()
     }
 
 
+    // Check crash and print crash report
     if( crash == 0 ){
         fprintf(fcrash, "CLEAR - No incidents to report.");
     }
     else{
-        fprintf(fcrash, "ACCIDENT - Time(%2.2f)\nVehicles: %d and %d\nCollision Speed: %f", t,  i,i-1,  fabs(vNew-velsP[j][i-1]) );
+        fprintf(fcrash, "currentACCIDENT - Time(%2.2f)\nVehicles: %d and %d\nCollision Speed: %f", t,  i,i-1,  fabs(vNew-velsP[j][i-1]) );
+        printf("ACCIDENT - Time(%2.2f)\nVehicles: %d and %d\nCollision Speed: %f", t,  i,i-1,  fabs(vNew-velsP[j][i-1]) );
     }
 
     /// Printing to a file and print sequence.
@@ -256,30 +258,44 @@ int main()
 }
 
 
-float v0( float start0Vel, float v0, float dt, short accelFlag ){
-    /// Steady State, Acceleration = 0
+float v0( float start0Vel, float v0, float dt, short accelFlag, float maxAccel){
+    float vDiff;
+/// 0 Steady State, Acceleration = 0
     if( accelFlag == 0 ){
         return v0;
     }
 
         // Optional HOWEVER, ENCROACHING ON NICO'S PROJECT. Suggested by Dr Prosperreti, use a function (specifically tanh) to model this acceleration
-    else if( accelFlag != 0 ){
-        float vDiff = start0Vel*1.3 - start0Vel;
+    else if( accelFlag == 1 || accelFlag == 2 ){
+        vDiff = start0Vel*1.3 - start0Vel;
         if( fabs(v0-start0Vel) < fabs(start0Vel*1.3-start0Vel) ){
             vDiff = vDiff/.5*dt; // Acceleration.
         }
         else vDiff = 0;
 
-    /// UNSTEADY, Acceleration Speed Up 30% over .5 a second
+/// 1 UNSTEADY, Acceleration Speed Up 30% over .5 a second
         if ( accelFlag == 1) return v0+vDiff;
-    /// UNSTEADY, Acceleration Slow Down 30%
+/// 2 UNSTEADY, Acceleration Slow Down 30%
         else if ( accelFlag == 2) return v0-vDiff;
+    }
 
-    /// UNSTEADY, Start from Rest to 42 m/s
-        else if ( accelFlag == 3{
-
+/// 3 UNSTEADY, Start from Rest to 42 m/s with (MAX ACCEL)
+    else if ( accelFlag == 3 ) {
+        vDiff = 0;
+        if( (42-v0) > 0 ){
+            vDiff = maxAccel*dt;
         }
-    /// UNSTEADY, Decelerate to Rest from 30 m/s
+        return v0+vDiff;
+    }
+
+/// 4 UNSTEADY, Decelerate to Rest from start velocity
+    else if ( accelFlag == 4){
+        vDiff = 0;
+        if( v0>0 ){
+            vDiff = maxAccel*dt;
+        }
+        if( v0-vDiff < 0 )  return 0;
+        else                return v0-vDiff;
     }
 
 }
