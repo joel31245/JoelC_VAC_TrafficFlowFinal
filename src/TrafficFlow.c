@@ -11,15 +11,15 @@
 
     Goals:
      - BASE GET base code in. Make everything variable.
-        - Steady State Conditions ---> 30% increase in velocity
-        - Steady State Conditions ---> 30% increase in velocity
+        -/ Steady State Conditions ---> 30% increase in velocity
+        -/ Steady State Conditions ---> 30% increase in velocity
         - From Standing (Rest)    ---> Initial Velocity
-     - BASE GET acceleration based on distance between vehicles.
+     -/ BASE GET acceleration based on distance between vehicles.
      - Be able to add in vehicles with different reaction parameters (like trucks and motorcycles)
      - Full Stop (A simulated light or reacting to a crash up ahead )
      - Minimum Separation Distance without crashing.
-     - Write to a file
-     - Display using Matlab or Paraview
+     -/ Write to a file
+     -/ Display using Matlab or Paraview
      - Display using Animations on a PowerPoint
 
      Equations:
@@ -117,12 +117,12 @@ int main()
 
     /// OUTPUT VARS
         road = malloc( sizeof(sizeOfVeh)*vehAmt );
-        velsP = malloc( sizeof(float)*(ceil(tEnd/dt)) );
-        for( j=0; j<ceil(tEnd/dt); j++ ){
+        velsP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
+        for( j=0; j<ceil(tEnd/dt)+1; j++ ){
             velsP[j] = malloc( sizeof(float)*vehAmt );
         }
-        posP = malloc( sizeof(float)*(ceil(tEnd/dt)) );
-        for( j=0; j<ceil(tEnd/dt); j++ ){
+        posP = malloc( sizeof(float)*(ceil(tEnd/dt)+1) );
+        for( j=0; j<ceil(tEnd/dt)+1; j++ ){
             posP[j] = malloc( sizeof(float)*vehAmt );
         }
 
@@ -211,7 +211,7 @@ int main()
             }
             // Check max Velocity
             if( velsP[j][i] > maxSpeed)       velsP[j][i] = maxSpeed;
-            else if( velsP[j][i] < -maxSpeed) velsP[j][i] = -maxSpeedl
+            else if( velsP[j][i] < -maxSpeed) velsP[j][i] = -maxSpeed;
 
 
             velsP[j][i] = vNew; posP[j][i] = xNew;
@@ -262,7 +262,6 @@ float v0( float start0Vel, float v0, float dt, short accelFlag ){
         return v0;
     }
 
-
         // Optional HOWEVER, ENCROACHING ON NICO'S PROJECT. Suggested by Dr Prosperreti, use a function (specifically tanh) to model this acceleration
     else if( accelFlag != 0 ){
         float vDiff = start0Vel*1.3 - start0Vel;
@@ -275,6 +274,12 @@ float v0( float start0Vel, float v0, float dt, short accelFlag ){
         if ( accelFlag == 1) return v0+vDiff;
     /// UNSTEADY, Acceleration Slow Down 30%
         else if ( accelFlag == 2) return v0-vDiff;
+
+    /// UNSTEADY, Start from Rest to 42 m/s
+        else if ( accelFlag == 3{
+
+        }
+    /// UNSTEADY, Decelerate to Rest from 30 m/s
     }
 
 }
