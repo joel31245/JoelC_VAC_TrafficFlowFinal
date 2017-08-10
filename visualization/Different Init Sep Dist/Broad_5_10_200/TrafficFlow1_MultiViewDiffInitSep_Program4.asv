@@ -55,14 +55,15 @@ y4 = x4(1,1:end-1)*0 + 39;
 figure(001);
 xlabel('Position');
 ylabel('Initial Seperation Distances');
-title('Distance Animation (Fine): Deceleration From 30 To 0 m/s. Initial Headway: Variable');
-set(gca, 'XLim', [x4(1,end-1)-10 x4(end,1)+10], 'YLim', [35 40]);
+title('Seperation Animation (Fine): Deceleration From 30 To 0 m/s. Initial Headway: Variable');
+pause;
+% set(gca, 'XLim', [x4(1,end-1)-10 x4(end,1)+10], 'YLim', [35 40]);
 road = animatedline('LineStyle','none', 'Marker','o', 'LineWidth',5);
 hold on;
 
 for i=1:size(x1,1)
       clearpoints(road);
-%       set(gca, 'XLim', [x4(i,end-1)-10 x4(i,1)+10], 'YLim', [35 40]);
+      set(gca, 'XLim', [x4(i,end-1)-10 x4(i,1)+10], 'YLim', [35 40]);
       addpoints(road,x1(i,1:end-1), y1);
       addpoints(road,x2(i,1:end-1), y2);
       addpoints(road,x3(i,1:end-1), y3);
@@ -87,7 +88,7 @@ for i=1:size(x1,1)
       M(i) = getframe(gcf);
 end
 
-video = VideoWriter('Distance Animation 2. Deceleration from 30 to 0 ms. Variable Headway', 'MPEG-4');
+video = VideoWriter('Seperation Animation 2. Deceleration from 30 to 0 ms. Variable Headway', 'MPEG-4');
 open(video);
 writeVideo(video, M);
 close(video);
