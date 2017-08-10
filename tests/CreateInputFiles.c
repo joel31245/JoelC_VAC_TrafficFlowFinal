@@ -61,12 +61,12 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
     char singleFileName[100];
     char strnum[100];
 
-    short tEnd = 37;
+    short tEnd = 30;
     float dt = .1;
     short amtVeh = 10;
     float y = 0.9;
     float vLen = 4.80;
-    float sepD = 200.0;
+    float sepD = 35.0;
     float iniV = 30.0;
 
     /// tEnd Range.

@@ -53,7 +53,7 @@ int main()
     struct Vehicle *road, sizeOfVeh;
     FILE *inpt = fopen("VehicleInfo.txt", "r");
     FILE *fvel = fopen("TrafficFlowVel.csv", "w");
-    FILE *fpos = fopen("PosDecel200.csv", "w");
+    FILE *fpos = fopen("PosLambda225.csv", "w");
     FILE *ferror = fopen("ProgramError.txt","w");
     FILE *fcrash = fopen("CrashReport.txt", "w");
     short i=0, j=0;         // loop counters
