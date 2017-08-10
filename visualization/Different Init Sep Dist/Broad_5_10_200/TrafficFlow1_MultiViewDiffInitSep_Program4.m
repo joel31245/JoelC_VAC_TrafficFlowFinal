@@ -87,7 +87,7 @@ for i=1:size(x1,1)
       M(i) = getframe(gcf);
 end
 
-video = VideoWriter('Distance Animation (Fine). Deceleration from 30 to 0 m/s. Variable Headway', 'MPEG-4');
+video = VideoWriter('Distance Animation 2 Deceleration from 30 to 0 m/s Variable Headway', 'MPEG-4');
 open(video);
 writeVideo(video, M);
 close(video);
