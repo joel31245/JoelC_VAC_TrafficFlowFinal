@@ -7,7 +7,7 @@ figure(001);
 xlabel('Position');
 ylabel('Different Lanes');
 title('Animation of the Vehicles');
-set(gca, 'XLim', [traffic(1,end-1) traffic(end,1)], 'YLim', [-1 1]);
+set(gca, 'XLim', [traffic(1,end-1)-10 traffic(end,1)+100], 'YLim', [-1 1]);
 road = animatedline('LineStyle','none', 'Marker','o', 'LineWidth',5);
 
 
@@ -20,7 +20,8 @@ end
 
 video = VideoWriter('TrafficFlowPositions.avi', 'MPEG-4');
 open(video);
-writeV
+writeVideo(video, M);
+close(video);
 
 
         

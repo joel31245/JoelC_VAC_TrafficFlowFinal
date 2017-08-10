@@ -53,7 +53,7 @@ int main()
     struct Vehicle *road, sizeOfVeh;
     FILE *inpt = fopen("VehicleInfo.txt", "r");
     FILE *fvel = fopen("TrafficFlowVel.csv", "w");
-    FILE *fpos = fopen("TrafficFlowPos.csv", "w");
+    FILE *fpos = fopen("PosInitSep125.csv", "w");
     FILE *ferror = fopen("ProgramError.txt","w");
     FILE *fcrash = fopen("CrashReport.txt", "w");
     short i=0, j=0;         // loop counters
@@ -233,13 +233,13 @@ int main()
     /// Printing to a file and print sequence.
     t = 0.00;
     for( j=0; j<(ceil(tEnd/dt)); j++ ){
-        printf("(Time: %2.2f)  ", t );
+        //printf("(Time: %2.2f)  ", t );
         for( i=0; i<vehAmt; i++ ){
             fprintf(fvel, "%f,",velsP[j][i] );
             fprintf(fpos, "%f,",posP[j][i] );
-            printf("(%d) %2.2f (XXXX) %2.2f   ", i,velsP[j][i],posP[j][i] );
+            //printf("(%d) %2.2f (XXXX) %2.2f   ", i,velsP[j][i],posP[j][i] );
         }
-        printf("\n\n\n");
+        //printf("\n\n\n");
         fprintf(fvel, "\n");
         fprintf(fpos,"\n");
         t+=dt;
@@ -253,6 +253,8 @@ int main()
     free(road);
     free(velsP);
     free(posP);
+
+    system("pause");
 
     return 0;
 }

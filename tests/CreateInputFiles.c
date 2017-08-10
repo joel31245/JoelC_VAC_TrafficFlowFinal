@@ -14,6 +14,7 @@ int main(){
     short checkParam = 0;
 
     while( continu == 'y' ){
+        invalidBounds = 1;
         printf("Please Give a file name for this set of input data: ");
         scanf(" %s", &fileName);
 
@@ -32,10 +33,6 @@ int main(){
         scanf("%d", &program);
         strcat(fileName, "_"); sprintf(strnum, "%d", program); strcat(strnum,"Program"); strcat(fileName, strnum);
         strcat(fileName, "_"); strcat(fileName, param);
-        strcat(fileName, "_"); sprintf(strnum, "%2.2f", minbnd); strcat(fileName, strnum);
-        strcat(fileName, "_"); sprintf(strnum, "%2.2f", stpsz); strcat(fileName, strnum);
-        strcat(fileName, "_"); sprintf(strnum, "%2.2f", maxbnd); strcat(fileName, strnum);
-        strcat(fileName, ".txt");
 
         checkParam = alterParam(fileName, program, param, minbnd, stpsz, maxbnd);
 
@@ -44,7 +41,7 @@ int main(){
             scanf(" %c", &continu);
         }
         else if( checkParam == 0 ){
-            printf("The files have been made! Would you like to do this again? (y/n) ");
+            printf("The files have been made! Would you like to run the application again? (y/n) ");
             scanf(" %c", &continu);
         }
         else { continu == 'n'; } // Safety to prevent infinite loops if the function fails to send a 0 or 1
@@ -53,14 +50,18 @@ int main(){
 
     printf("Have a nice day! Program terminating... \n\n");
 
+    system("pause");
+
     return 0;
 }
 
 int alterParam(char fileName[100], short program, char param[100], float minbnd, float stpsz, float maxbnd ){
     float i, j; /* loop counters */
-    FILE *f = fopen(fileName, "w");
+    FILE *f;// = fopen(fileName, "w");
+    char singleFileName[100];
+    char strnum[100];
 
-    short tEnd = 50;
+    short tEnd = 37;
     float dt = .1;
     short amtVeh = 10;
     float y = 0.9;
@@ -76,13 +77,16 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         if( (short) minbnd <= 0) minbnd = stpsz;
 
         for( i=(short)minbnd; i<=(short)maxbnd; i+=(short)stpsz ){
-            fprintf(f, "%d, %f, %d, %d,\n", i,dt, program, amtVeh);
+            strcpy(singleFileName,fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%2.2f", i); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(f, "%d, %2.2f, %d, %d,\n", i,dt, program, amtVeh);
             for( j=0; j<amtVeh; j+=1 ){
-                if( j != amtVeh-1 )     fprintf(f, "%f, 4.80, 200, 30,\n",y, vLen, sepD, iniV);
-                else                    fprintf(f, "%f, 4.80, 200, 30",y, vLen, sepD, iniV);
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n",y, vLen, sepD, iniV);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f",y, vLen, sepD, iniV);
             }
+            fclose(f);
         }
-        fclose(f);
         return 0;
     }/// END OF tEnd
     /// dt
@@ -93,13 +97,16 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         if(  minbnd <= 0) minbnd = stpsz;
 
         for( i=minbnd; i<=maxbnd; i+=stpsz ){
-            fprintf(f, "%d, %f, %d, %d,\n", tEnd, i,program, amtVeh);
+            strcpy(singleFileName, fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%2.2f", i); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(f, "%d, %2.2f, %d, %d,\n", tEnd, i,program, amtVeh);
             for( j=0; j<amtVeh; j+=1 ){
-                if( j != amtVeh-1 )     fprintf(f, "%f, 4.80, 200, 30,\n",y, vLen, sepD, iniV);
-                else                    fprintf(f, "%f, 4.80, 200, 30",y, vLen, sepD, iniV);
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n",y, vLen, sepD, iniV);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f",y, vLen, sepD, iniV);
             }
+            fclose(f);
         }
-        fclose(f);
         return 0;
     }/// END OF dt
     /// amtVeh
@@ -110,13 +117,16 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         if( (short) minbnd <= 0) minbnd = stpsz;
 
         for( i=(short)minbnd; i<=(short)maxbnd; i+=(short)stpsz ){
-            fprintf(f, "%d, %f, %d, %d,\n", tEnd, dt, program, i);
+            strcpy(singleFileName, fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%2.2f", i); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(f, "%d, %2.2f, %d, %d,\n", tEnd, dt, program, i);
             for( j=0; j<i; j+=1 ){
-                if( j != amtVeh-1 )     fprintf(f, "%f, 4.80, 200, 30,\n",y, vLen, sepD, iniV);
-                else                    fprintf(f, "%f, 4.80, 200, 30",y, vLen, sepD, iniV);
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n",y, vLen, sepD, iniV);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f",y, vLen, sepD, iniV);
             }
+            fclose(f);
         }
-        fclose(f);
         return 0;
     }/// END OF amtVeh
 
@@ -127,13 +137,16 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         if(  minbnd <= 0) minbnd = stpsz;
 
         for( i=minbnd; i<=maxbnd; i+=stpsz ){
-            fprintf(f, "%d, %f, %d, %d,\n", tEnd, dt, program, amtVeh);
+            strcpy(singleFileName, fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%2.2f", i); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(f, "%d, %2.2f, %d, %d,\n", tEnd, dt, program, amtVeh);
             for( j=0; j<amtVeh; j+=1 ){
-                if( j != amtVeh-1 )     fprintf(f, "%f, 4.80, 200.0, 30.0,\n", i, vLen, sepD, iniV);
-                else                    fprintf(f, "%f, 4.80, 200.0, 30.0", i, vLen, sepD, iniV);
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n", i, vLen, sepD, iniV);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f", i, vLen, sepD, iniV);
             }
+            fclose(f);
         }
-        fclose(f);
         return 0;
     }/// END OF Lambda
     /// vehLength
@@ -143,13 +156,16 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         if(  minbnd <= 0) minbnd = stpsz;
 
         for( i=minbnd; i<=maxbnd; i+=stpsz ){
-            fprintf(f, "%d, %f, %d, %d,\n", tEnd, dt, program, amtVeh);
+            strcpy(singleFileName, fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%2.2f", i); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(f, "%d, %2.2f, %d, %d,\n", tEnd, dt, program, amtVeh);
             for( j=0; j<amtVeh; j+=1 ){
-                if( j != amtVeh-1 )     fprintf(f, "%f, %f, 200.0, 30.0,\n", y, i, sepD, iniV);
-                else                    fprintf(f, "%f, %f, 200.0, 30.0", y, i, sepD, iniV);
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n", y, i, sepD, iniV);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f", y, i, sepD, iniV);
             }
+            fclose(f);
         }
-        fclose(f);
         return 0;
     }/// END OF vehLength
     /// Seperation Distance
@@ -159,13 +175,16 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         if(  minbnd <= 0) minbnd = stpsz;
 
         for( i=minbnd; i<=maxbnd; i+=stpsz ){
-            fprintf(f, "%d, %f, %d, %d,\n", tEnd, dt, program, amtVeh);
+            strcpy(singleFileName, fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%2.2f", i); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(f, "%d, %2.2f, %d, %d,\n", tEnd, dt, program, amtVeh);
             for( j=0; j<amtVeh; j+=1 ){
-                if( j != amtVeh-1 )     fprintf(f, "%f, 4.80, %f, 30.0,\n", y, vLen, i, iniV);
-                else                    fprintf(f, "%f, 4.80, %f, 30.0", y, vLen, i, iniV);
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n", y, vLen, i, iniV);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f", y, vLen, i, iniV);
             }
+            fclose(f);
         }
-        fclose(f);
         return 0;
     }/// END OF Seperation Distance
     /// Initial Velocity
@@ -176,16 +195,18 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         if(  minbnd > 45.0) minbnd = stpsz; if(maxbnd > 45) maxbnd = 45.0;
 
         for( i=minbnd; i<=maxbnd; i+=stpsz ){
-            fprintf(f, "%d, %f, %d, %d,\n", tEnd, dt, program, amtVeh);
+            strcpy(singleFileName, fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%2.2f", i); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(f, "%d, %2.2f, %d, %d,\n", tEnd, dt, program, amtVeh);
             for( j=0; j<amtVeh; j+=1 ){
-                if( j != amtVeh-1 )     fprintf(f, "%f, 4.80, 200.0, %f,\n", y, vLen, sepD, i);
-                else                    fprintf(f, "%f, 4.80, 200.0, %f", y, vLen, sepD, i);
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n", y, vLen, sepD, i);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f", y, vLen, sepD, i);
             }
+            fclose(f);
         }
-        fclose(f);
         return 0;
     }/// END OF Initial Velocity
 
-    fclose(f);
     return 1;
 }
