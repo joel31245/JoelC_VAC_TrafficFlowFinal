@@ -14,7 +14,7 @@ int main(){
     char strnum[100];
     char continu = 'y';
     short checkParam = 0;
-    finstruc = fopen("InstructionsForProgramTrafficFlow", "w");
+    finstruc = fopen("InstructionsForProgramTrafficFlow.txt", "w");
     short fins_numFiles = 0; float i;
 
     //while( continu == 'y' ){
@@ -62,7 +62,7 @@ int main(){
 //
 //    //}
 
-    printf("Have a nice day! Program terminating... \n\n");
+    printf("Make Sure you move ALL files (including the instruction file to the 'TrafficFlowReadCreateMultiple' Folder.\n\nHave a nice day! Program terminating... \n\n");
     fclose(finstruc);
     system("pause");
 
