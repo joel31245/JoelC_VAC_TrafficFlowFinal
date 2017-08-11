@@ -267,7 +267,7 @@ float v0( float start0Vel, float v0, float dt, short accelFlag, float maxAccel){
         return v0;
     }
 
-        // Optional HOWEVER, ENCROACHING ON NICO'S PROJECT. Suggested by Dr Prosperreti, use a function (specifically tanh) to model this acceleration
+
     else if( accelFlag == 1 || accelFlag == 2 ){
         vDiff = start0Vel*1.3 - start0Vel;
         if( fabs(v0-start0Vel) < fabs(start0Vel*1.3-start0Vel) ){
