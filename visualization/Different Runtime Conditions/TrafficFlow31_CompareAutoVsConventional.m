@@ -28,19 +28,19 @@ for j=1:5
     xlabel('Position (m)');
     ylabel('0-Automated   1-Conventional');
     
-    if ( j==1 ) titleName = sprintf('Separation: Program %d - Steady State',j-1); end
-    if ( j==2 ) titleName = sprintf('Separation: Program %d - Accelerate 30P',j-1); end
-    if ( j==3 ) titleName = sprintf('Separation: Program %d - Decelerate 30P',j-1); end
-    if ( j==4 ) titleName = sprintf('Separation: Program %d - Accelerate 0-42m/s',j-1); end
-    if ( j==5 ) titleName = sprintf('Separation: Program %d - Decelerate 30-0m/s',j-1); end  
+    if ( j==1 ) titleName = sprintf('Distance: Program %d - Steady State',j-1); end
+    if ( j==2 ) titleName = sprintf('Distance: Program %d - Accelerate 30P',j-1); end
+    if ( j==3 ) titleName = sprintf('Distance: Program %d - Decelerate 30P',j-1); end
+    if ( j==4 ) titleName = sprintf('Distance: Program %d - Accelerate 0-42m/s',j-1); end
+    if ( j==5 ) titleName = sprintf('Distance: Program %d - Decelerate 30-0m/s',j-1); end  
         
     title(titleName);
-%     set(gca, 'XLim', [x(j,1,end-1)-10 x(j,end,1)+10], 'YLim', [-.25 1.25]);   
+    set(gca, 'XLim', [x(j,1,end-1)-10 x(j,end,1)+10], 'YLim', [-.25 1.25]);   
     road = animatedline('LineStyle','none', 'Marker','o', 'LineWidth',5);
 
     for i=1:size(x,2)
           clearpoints(road);
-          set(gca, 'XLim', [x(j,i,end-1)-10 x(j,i,1)+10], 'YLim', [-.25 1.25]); 
+%           set(gca, 'XLim', [x(j,i,end-1)-10 x(j,i,1)+10], 'YLim', [-.25 1.25]); 
           xC(:) = x(j,i,1:end-1);
           addpoints(road, xC, y(j,:));  
           xC1(:) = x(j+5,i,1:end-1);
@@ -48,7 +48,7 @@ for j=1:5
           drawnow;   
           M(i) = getframe(gcf);
     end
-    videoName = sprintf('Separation Comparison Program%d',j);
+    videoName = sprintf('Distance Comparison Program%d',j);
     video = VideoWriter(videoName, 'MPEG-4');
     open(video);
     writeVideo(video, M);

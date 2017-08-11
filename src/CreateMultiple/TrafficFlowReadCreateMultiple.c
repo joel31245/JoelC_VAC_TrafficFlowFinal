@@ -79,8 +79,12 @@ int main()
     char fileName[100];
     char outputFileName[100]; char modifier[4];
     FILE *instrct = fopen("InstructionsForProgramTrafficFlow.txt", "r");
+    FILE *fmiv = fopen("matlabInstructionsVel.txt", "w"); // Matlab Instructions File
+    FILE *fmix = fopen("matlabInstructionsPos.txt", "w"); // Matlab Instructions File
     short finstruct_num = 0;
     fscanf(instrct, "%d ", &finstruct_num);
+    fprintf(fmiv, "%d\n", finstruct_num);
+    fprintf(fmix, "%d\n", finstruct_num);
 
     /* FILE VARIABLES */
     FILE *inpt;
@@ -91,16 +95,21 @@ int main()
 
     /* MASTER LOOP, TELLS HOW MANY TIME PROGRAM RUNS IN ORDER TO CREATE ALL THESE FILES. */
     for( multiFile=0; multiFile<finstruct_num; multiFile++ ){
-        printf("%d\n", i);
+
         fscanf(instrct, "%s ", &fileName);
 
         inpt = fopen(fileName, "r");
         strcpy(outputFileName,"Vel_"); strcat(outputFileName,fileName); strcat(outputFileName,".csv");
         fvel = fopen(outputFileName, "w");
+        fprintf(fmiv, "%s\n", outputFileName);
+
         strcpy(outputFileName, "Pos_"); strcat(outputFileName,fileName); strcat(outputFileName,".csv");
         fpos = fopen(outputFileName, "w");
+        fprintf(fmix, "%s\n", outputFileName);
+
         strcpy(outputFileName, "ProgramError_"); strcat(outputFileName,fileName);
         ferror = fopen(outputFileName,"w");
+
         strcpy(outputFileName, "CrashReport_"); strcat(outputFileName,fileName);
         fcrash = fopen(outputFileName, "w");
 
@@ -221,7 +230,7 @@ int main()
                 xStar2 = posP[j-1][i] + dt/2*v(vStar);
 
                 vStar3 = velsP[j-1][i] + dt*f(vStar2,road[i].y, velsP[j][i-1]);
-                xStar3 = posP[j-1][i] + dt/2*v(vStar2);
+                xStar3 = posP[j-1][i] + dt*v(vStar2);
 
                 vNew = velsP[j-1][i]+dt/6*( f(velsP[j-1][i],road[i].y, velsP[j][i-1]) + 2*f(vStar,road[i].y, velsP[j][i-1]) +
                                         2*f(vStar2,road[i].y, velsP[j][i-1]) +   f(vStar3,road[i].y, velsP[j][i-1]) );
@@ -287,6 +296,8 @@ int main()
         free(posP);
 
     }
+
+    system("pause");
 
     return 0;
 }

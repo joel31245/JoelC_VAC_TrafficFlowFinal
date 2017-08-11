@@ -1,3 +1,0 @@
-currentACCIDENT - Time(2.60)
-Vehicles: 1 and 0
-Collision Speed: 6.981865

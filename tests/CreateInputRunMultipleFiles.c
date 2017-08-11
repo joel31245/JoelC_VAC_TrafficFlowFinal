@@ -26,17 +26,25 @@ int main(){
         printf("(tEnd, dt, runtimeProtocolFlag, amountOfVehicles, lambda, vehicleLength, initSepDist, initialVelocity\n");
 
         scanf(" %s", &param);
+        if( strcmp(param,"runtimeProtocolFlag") != 0 ){
+            while(invalidBounds == 1 ){
+                printf("Please Specify range you want the parameter to go between. (min bound, step size, max bound)");
+                scanf(" %f, %f, %f", &minbnd, &stpsz, &maxbnd);
+                    // error message
+                if( minbnd+stpsz < maxbnd ) invalidBounds = 0;
+            }
 
-        while(invalidBounds == 1 ){
-            printf("Please Specify range you want the parameter to go between. (min bound, step size, max bound)");
-            scanf(" %f, %f, %f", &minbnd, &stpsz, &maxbnd);
-                // error message
-            if( minbnd+stpsz < maxbnd ) invalidBounds = 0;
+            printf("Which Program? \n(0 - Steady State\n 1 - Accelerate 30\%\n 2 - Decelerate 30\%\n 3 - Accelerate From Rest \n 4 - Decelerate To Rest)\n");
+            scanf("%d", &program);
+            strcat(fileName, "_"); sprintf(strnum, "%d", program); strcat(strnum,"Program"); strcat(fileName, strnum);
         }
-        printf("Which Program? \n(0 - Steady State\n 1 - Accelerate 30\%\n 2 - Decelerate 30\%\n 3 - Accelerate From Rest \n 4 - Decelerate To Rest)\n");
-        scanf("%d", &program);
-        strcat(fileName, "_"); sprintf(strnum, "%d", program); strcat(strnum,"Program"); strcat(fileName, strnum);
+        else{
+            invalidBounds = 0;
+            minbnd = 0; maxbnd = 4; stpsz = 1;
+        }
+
         strcat(fileName, "_"); strcat(fileName, param);
+
 
         for( i=minbnd; i<=maxbnd; i+=stpsz ) fins_numFiles++;
         fprintf(finstruc, " %d ", fins_numFiles);
@@ -80,7 +88,7 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
     short amtVeh = 10;
     float y = 0.9;
     float vLen = 4.80;
-    float sepD = 35.0;
+    float sepD = 80.0;
     float iniV = 30.0;
 
     /// tEnd Range.
@@ -125,6 +133,24 @@ int alterParam(char fileName[100], short program, char param[100], float minbnd,
         }
         return 0;
     }/// END OF dt
+    /// runTimeProtocol Range.
+    if( strcmp(param, "runtimeProtocolFlag") == 0 ){
+        // Check if bounds make sense
+        short ic;
+        for( ic=0; ic<=4; ic++ ){
+            strcpy(singleFileName,fileName);
+            strcat(singleFileName, "_"); sprintf(strnum, "%d", ic); strcat(singleFileName, strnum); strcat(singleFileName, ".txt");
+            f = fopen(singleFileName,"w");
+            fprintf(finstruc, " %s\n", singleFileName);
+            fprintf(f, "%d, %2.2f, %d, %d,\n", tEnd,dt, ic, amtVeh);
+            for( j=0; j<amtVeh; j+=1 ){
+                if( j != amtVeh-1 )     fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f,\n",y, vLen, sepD, iniV);
+                else                    fprintf(f, "%2.2f, %2.2f, %2.2f, %2.2f",y, vLen, sepD, iniV);
+            }
+            fclose(f);
+        }
+        return 0;
+    }/// END OF runtimeProtocolFlag Range.
     /// amtVeh
     if( strcmp(param, "amountOfVehicles") == 0 ){
             // Check if bounds make sense

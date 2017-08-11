@@ -233,13 +233,13 @@ int main()
     /// Printing to a file and print sequence.
     t = 0.00;
     for( j=0; j<(ceil(tEnd/dt)); j++ ){
-        //printf("(Time: %2.2f)  ", t );
+        printf("(Time: %2.2f)  ", t );
         for( i=0; i<vehAmt; i++ ){
             fprintf(fvel, "%f,",velsP[j][i] );
             fprintf(fpos, "%f,",posP[j][i] );
-            //printf("(%d) %2.2f (XXXX) %2.2f   ", i,velsP[j][i],posP[j][i] );
+            printf("(%d) %2.2f (XXXX) %2.2f   ", i,velsP[j][i],posP[j][i] );
         }
-        //printf("\n\n\n");
+        printf("\n\n\n");
         fprintf(fvel, "\n");
         fprintf(fpos,"\n");
         t+=dt;
