@@ -189,7 +189,7 @@ int main()
             xStar2 = posP[j-1][i] + dt/2*v(vStar);
 
             vStar3 = velsP[j-1][i] + dt*f(vStar2,road[i].y, velsP[j][i-1]);
-            xStar3 = posP[j-1][i] + dt/2*v(vStar2);
+            xStar3 = posP[j-1][i] + dt*v(vStar2);
 
             vNew = velsP[j-1][i]+dt/6*( f(velsP[j-1][i],road[i].y, velsP[j][i-1]) + 2*f(vStar,road[i].y, velsP[j][i-1]) +
                                     2*f(vStar2,road[i].y, velsP[j][i-1]) +   f(vStar3,road[i].y, velsP[j][i-1]) );
